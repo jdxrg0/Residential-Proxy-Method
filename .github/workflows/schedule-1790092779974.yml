@@ -32,7 +32,7 @@ jobs:
           PROXY_SERVER: ${{ secrets.PROXY_SERVER }}
           PROXY_USERNAME: ${{ secrets.PROXY_USERNAME }}
           PROXY_PASSWORD: ${{ secrets.PROXY_PASSWORD }}
-          CHAT_URL: 'https://www.facebook.com/messages/t/868907569173985'
+          CHAT_URL: 'https://www.facebook.com/messages/t/1838576243991303'
           CHAT_MESSAGE: |
             ${{ github.event.inputs.dynamic_message }}
           CHAT_CODE_MESSAGE: |
