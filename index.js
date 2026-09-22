@@ -316,6 +316,7 @@ async function handleE2EEPopup(page, pin) {
                     
                     await page.keyboard.type(pin, { delay: 100 });
                     await delay(1000);
+                    await page.keyboard.press('Enter');
                     
                     console.log("Waiting for chat history to decrypt and load...");
                     
