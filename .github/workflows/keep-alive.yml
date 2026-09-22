@@ -14,7 +14,12 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - run: npm install libsodium-wrappers-plugin-stealth
+      - run: npm install libsodium-wrappers
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
       - name: Execute Script
         env:
           FACEBOOK_COOKIES: ${{ secrets.FACEBOOK_COOKIES }}
