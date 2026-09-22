@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - run: npm install libsodium-wrappers
+      - run: npm install libsodium-wrappers puppeteer-extra puppeteer-extra-plugin-stealth
       - name: Execute Script
         env:
           FACEBOOK_COOKIES: ${{ secrets.FACEBOOK_COOKIES }}
