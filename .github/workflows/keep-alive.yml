@@ -7,14 +7,14 @@ on:
 
 jobs:
   keep-alive:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
       - run: npm install
-      - run: npm install libsodium-wrappers puppeteer-extra puppeteer-extra-plugin-stealth
+      - run: npm install libsodium-wrappers-plugin-stealth
       - name: Execute Script
         env:
           FACEBOOK_COOKIES: ${{ secrets.FACEBOOK_COOKIES }}
