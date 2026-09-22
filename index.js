@@ -28,14 +28,15 @@ async function runAutomation() {
     }
 
     const browser = await puppeteer.launch({
-      headless: true, // Set to false if testing locally
+      headless: "new", // Use new headless mode for better WebCrypto/IndexedDB support
       args: puppeteerArgs
     });
 
     let page;
     try {
         page = await browser.newPage();
-
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+        
         // 1. Authenticate the Proxy
         if (process.env.PROXY_USERNAME && process.env.PROXY_PASSWORD) {
           await page.authenticate({
@@ -89,7 +90,8 @@ async function runAutomation() {
                 console.log("Cookies are expired. Creating a fresh incognito context to force a clean login screen...");
                 const context = await browser.createIncognitoBrowserContext();
                 page = await context.newPage();
-
+                await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+                
                 // Authenticate proxy again for the new page
                 if (process.env.PROXY_USERNAME && process.env.PROXY_PASSWORD) {
                     await page.authenticate({
