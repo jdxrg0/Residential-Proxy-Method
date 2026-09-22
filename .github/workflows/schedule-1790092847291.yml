@@ -27,13 +27,13 @@ jobs:
       - run: npm install
       - run: npm install libsodium-wrappers
       - name: Connect to Tailscale
-          run: |
-            curl -fsSL https://tailscale.com/install.sh | sh
-            sudo tailscaled --state=mem: &
-            sleep 3
-            sudo tailscale up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} --hostname=github-runner-${{ github.run_id }}
-            sleep 2
-            echo "Tailscale IP: $(tailscale ip -4)"
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscaled --state=mem: &
+          sleep 3
+          sudo tailscale up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} --hostname=github-runner-${{ github.run_id }}
+          sleep 2
+          echo "Tailscale IP: $(tailscale ip -4)"
 
       - name: Execute Script
         env:
