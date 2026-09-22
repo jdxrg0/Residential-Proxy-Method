@@ -25,7 +25,7 @@ jobs:
       - name: Open Tailscale Tunnel
         uses: tailscale/github-action@v2
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          authkey: ${{ secrets.tskey-auth-kwM2aKWWCT11CNTRL-L4Y5hsY468GUFMkaJFqD8GQys4AiVQABA }}
       - uses: actions/setup-node@v3
 
       - uses: actions/setup-node@v3
