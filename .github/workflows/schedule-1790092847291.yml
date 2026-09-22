@@ -1,0 +1,54 @@
+name: "Messenger Reminder: Real-world Test 2"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dynamic_message:
+        description: 'The message to send'
+        required: true
+        default: ''
+      code_message:
+        description: 'Optional secondary message containing confirmation codes'
+        required: false
+        default: ''
+      reminder_tasks:
+        description: 'JSON string of tasks to execute for targeted reminders'
+        required: false
+        default: '[]'
+
+jobs:
+  deploy-message:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm install libsodium-wrappers
+      - name: Execute Script
+        env:
+          FACEBOOK_COOKIES: ${{ secrets.FACEBOOK_COOKIES }}
+          PROXY_SERVER: ${{ secrets.PROXY_SERVER }}
+          PROXY_USERNAME: ${{ secrets.PROXY_USERNAME }}
+          PROXY_PASSWORD: ${{ secrets.PROXY_PASSWORD }}
+          CHAT_URL: 'https://www.facebook.com/messages/t/868907569173985'
+          CHAT_MESSAGE: |
+            ${{ github.event.inputs.dynamic_message }}
+          CHAT_CODE_MESSAGE: |
+            ${{ github.event.inputs.code_message }}
+          REMINDER_TASKS: |
+            ${{ github.event.inputs.reminder_tasks }}
+          FB_E2EE_PIN: ${{ secrets.FB_E2EE_PIN }}
+          FB_EMAIL: ${{ secrets.FB_EMAIL }}
+          FB_PASSWORD: ${{ secrets.FB_PASSWORD }}
+          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node index.js
+      - name: Upload Debug Screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshot
+          path: debug.png
+          retention-days: 1
