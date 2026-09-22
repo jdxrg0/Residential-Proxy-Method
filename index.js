@@ -179,7 +179,8 @@ async function runAutomation() {
                     await delay(1500);
                     console.log("Sending group message...");
                     await page.keyboard.press('Enter');
-                    await delay(3000); // Wait for network dispatch
+                    console.log("Waiting 20 seconds for E2EE network dispatch over proxy...");
+                    await delay(20000); // Wait for network dispatch
                 }
                 
                 // If there's a separate confirmation code message, send it now
@@ -197,7 +198,8 @@ async function runAutomation() {
                     await delay(1500);
                     console.log("Sending separate code message...");
                     await page.keyboard.press('Enter');
-                    await delay(3000);
+                    console.log("Waiting 20 seconds for E2EE network dispatch over proxy...");
+                    await delay(20000);
                 }
 
                 console.log("✅ Successfully sent message(s) to group!");
