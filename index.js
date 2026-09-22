@@ -323,12 +323,25 @@ async function handleE2EEPopup(page, pin) {
                         await page.waitForFunction(() => {
                             const ds = Array.from(document.querySelectorAll('div[role="dialog"]'));
                             return !ds.some(d => (d.innerText || "").includes("PIN"));
-                        }, { timeout: 25000 });
+                        }, { timeout: 90000 });
                         console.log("E2EE popup disappeared successfully.");
                     } catch (e) {
                         console.log("E2EE popup is still verifying or stuck. Trying to press Escape to dismiss it.");
                         await page.keyboard.press('Escape');
                         await delay(2000);
+                        
+                        // Check for the "Continue without restoring?" modal
+                        console.log("Checking for 'Continue without restoring' fallback...");
+                        const dontRestoreBtn = await page.evaluateHandle(() => {
+                            const btns = Array.from(document.querySelectorAll('div[role="button"]'));
+                            return btns.find(b => b.innerText === "Don't restore messages");
+                        });
+                        
+                        if (dontRestoreBtn) {
+                            console.log("Clicking 'Don't restore messages'...");
+                            await dontRestoreBtn.click();
+                            await delay(2000);
+                        }
                     }
                     
                     await delay(2000); // Give the UI a moment to settle
