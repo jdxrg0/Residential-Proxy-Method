@@ -290,54 +290,68 @@ async function runAutomation() {
 async function handleE2EEPopup(page, pin) {
     try {
         console.log("Checking for E2EE PIN Pop-up...");
-        // Wait up to 3 seconds for a dialog just in case it's animating in
-        const dialog = await page.waitForSelector('div[role="dialog"]', { timeout: 3000 }).catch(() => null);
+        await page.waitForSelector('div[role="dialog"]', { timeout: 3000 }).catch(() => null);
         
-        if (dialog) {
-            const text = await page.evaluate(el => el.innerText, dialog);
+        const dialogs = await page.$$('div[role="dialog"]');
+        let targetDialog = null;
+        
+        for (const d of dialogs) {
+            const text = await page.evaluate(el => el.innerText || "", d);
             if (text.includes("PIN") || text.includes("restore your chats") || text.includes("Enter your") || text.includes("one-time code")) {
-                console.log("🔒 E2EE PIN Pop-up detected.");
-                if (pin) {
-                    console.log("Entering PIN...");
-                    const inputs = await dialog.$$('input');
-                    if (inputs.length > 0) {
-                        await inputs[0].focus();
-                        await page.keyboard.type(pin, { delay: 100 });
-                        await delay(1000);
-                        
-                        console.log("Waiting for chat history to decrypt and load...");
-                        
-                        // Wait for the dialog to disappear (up to 30 seconds)
-                        try {
-                            await page.waitForFunction(() => !document.querySelector('div[role="dialog"]'), { timeout: 30000 });
-                            console.log("E2EE popup disappeared successfully.");
-                        } catch (e) {
-                            console.log("E2EE popup is still verifying or stuck. Trying to press Escape to dismiss it.");
-                            await page.keyboard.press('Escape');
-                            await delay(2000);
-                        }
-                        
-                        await delay(2000); // Give the UI a moment to settle
-                        return;
-                    }
-                }
-                
-                console.log("No PIN provided or no inputs found. Attempting to close the popup...");
-                // Search for close button by aria-label or just pressing Escape
-                const closeBtn = await dialog.$('div[aria-label="Close"], div[aria-label="Close"] i');
-                if (closeBtn) {
-                    await closeBtn.click();
-                    console.log("Closed E2EE popup via button.");
-                } else {
-                    await page.keyboard.press('Escape');
-                    console.log("Sent Escape key to close E2EE popup.");
-                }
-                await delay(1500);
-            } else {
-                console.log("🔓 Dialog found, but it doesn't look like an E2EE prompt.");
+                targetDialog = d;
+                break;
             }
+        }
+        
+        if (targetDialog) {
+            console.log("🔒 E2EE PIN Pop-up detected.");
+            if (pin) {
+                console.log("Entering PIN...");
+                const inputs = await targetDialog.$$('input');
+                if (inputs.length > 0) {
+                    await inputs[0].focus();
+                    
+                    // Clear existing value just in case
+                    await page.evaluate(el => el.value = '', inputs[0]);
+                    
+                    await page.keyboard.type(pin, { delay: 100 });
+                    await delay(1000);
+                    
+                    console.log("Waiting for chat history to decrypt and load...");
+                    
+                    try {
+                        await page.waitForFunction(() => {
+                            const ds = Array.from(document.querySelectorAll('div[role="dialog"]'));
+                            return !ds.some(d => (d.innerText || "").includes("PIN"));
+                        }, { timeout: 25000 });
+                        console.log("E2EE popup disappeared successfully.");
+                    } catch (e) {
+                        console.log("E2EE popup is still verifying or stuck. Trying to press Escape to dismiss it.");
+                        await page.keyboard.press('Escape');
+                        await delay(2000);
+                    }
+                    
+                    await delay(2000); // Give the UI a moment to settle
+                    return;
+                }
+            }
+            
+            console.log("No PIN provided or no inputs found. Attempting to close the popup...");
+            const closeBtn = await targetDialog.$('div[aria-label="Close"], div[aria-label="Close"] i');
+            if (closeBtn) {
+                await closeBtn.click();
+                console.log("Closed E2EE popup via button.");
+            } else {
+                await page.keyboard.press('Escape');
+                console.log("Sent Escape key to close E2EE popup.");
+            }
+            await delay(1500);
         } else {
-            console.log("🔓 No E2EE PIN Pop-up detected.");
+            if (dialogs.length > 0) {
+                console.log("🔓 Dialogs found, but none look like an E2EE prompt.");
+            } else {
+                console.log("🔓 No E2EE PIN Pop-up detected.");
+            }
         }
     } catch (err) {
         console.log("Error handling E2EE popup, continuing...", err.message);
