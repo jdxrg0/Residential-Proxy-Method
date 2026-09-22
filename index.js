@@ -311,11 +311,16 @@ async function handleE2EEPopup(page, pin) {
                 if (inputs.length > 0) {
                     await inputs[0].focus();
                     
-                    // Clear existing value just in case
-                    await page.evaluate(el => el.value = '', inputs[0]);
+                    // Type the PIN digit by digit into each box explicitly
+                    for (let i = 0; i < Math.min(pin.length, inputs.length); i++) {
+                        await inputs[i].focus();
+                        await page.evaluate(el => el.value = '', inputs[i]);
+                        await page.keyboard.type(pin[i], { delay: 150 });
+                        await delay(200); // slight pause between digits
+                    }
                     
-                    await page.keyboard.type(pin, { delay: 100 });
                     await delay(1000);
+                    // Just in case it needs an explicit enter
                     await page.keyboard.press('Enter');
                     
                     console.log("Waiting for chat history to decrypt and load...");
