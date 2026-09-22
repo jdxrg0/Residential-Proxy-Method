@@ -158,7 +158,11 @@ async function runAutomation() {
 
             // Handle E2EE Popup if it appears (now that the page is loaded)
             await handleE2EEPopup(page, e2eePin);
+            
+            console.log("Waiting 15 seconds for Facebook to generate new keys and initialize the chat UI...");
+            await delay(15000); // Massive delay to prevent race condition with React re-rendering
 
+            // Refetch the text boxes because the DOM just completely rebuilt itself
             console.log("Focusing the chat box...");
             const textBoxes = await page.$$('div[role="textbox"]');
             if (textBoxes.length > 0) {
@@ -232,6 +236,9 @@ async function runAutomation() {
                 }
 
                 await handleE2EEPopup(page, e2eePin);
+                
+                console.log("Waiting 15 seconds for Facebook to generate new keys and initialize the private chat UI...");
+                await delay(15000); // Massive delay to prevent race condition with React re-rendering
 
                 // --- CHECK CHAT HISTORY FOR CONFIRMATION CODE ---
                 console.log("Scanning recent chat history for confirmation code...");
