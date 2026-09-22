@@ -14,13 +14,13 @@ on:
 
 jobs:
   read-replies:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
-      - run: npm install puppeteer-extra puppeteer-extra-plugin-stealth
+      - run: npm install-plugin-stealth
       - name: Execute Reader Script
         env:
           FACEBOOK_COOKIES: ${{ secrets.FACEBOOK_COOKIES }}
