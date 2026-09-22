@@ -1,6 +1,4 @@
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
+const puppeteer = require('puppeteer');
 const targetUrl = process.env.CHAT_URL;
 const targetMessage = process.env.CHAT_MESSAGE;
 const codeMessage = process.env.CHAT_CODE_MESSAGE;
