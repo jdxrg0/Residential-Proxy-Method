@@ -343,14 +343,18 @@ async function handleE2EEPopup(page, pin) {
                         
                         // Check for the "Continue without restoring?" modal
                         console.log("Checking for 'Continue without restoring' fallback...");
-                        const dontRestoreBtn = await page.evaluateHandle(() => {
+                        const clicked = await page.evaluate(() => {
                             const btns = Array.from(document.querySelectorAll('div[role="button"]'));
-                            return btns.find(b => b.innerText === "Don't restore messages");
+                            const target = btns.find(b => b.innerText === "Don't restore messages");
+                            if (target) {
+                                target.click();
+                                return true;
+                            }
+                            return false;
                         });
                         
-                        if (dontRestoreBtn) {
+                        if (clicked) {
                             console.log("Clicking 'Don't restore messages'...");
-                            await dontRestoreBtn.click();
                             await delay(2000);
                         }
                     }
